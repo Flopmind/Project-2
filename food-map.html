@@ -5,6 +5,7 @@
 	<title>Food Map</title>
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/bootstrap-grid.css">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
@@ -22,31 +23,42 @@
         margin: 0;
         padding: 0;
         }
+        
+        #root
+        {
+            position: absolute;
+            top: 10px;
+            left: 200px;
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(211, 211, 211, 0.75);
+        }
     </style>
 </head>
 <body>
-<div id="map"></div>
-<div id="root">
-    <h1>Restaurants in {{area}}:</h1>
-    Search: <input id="searchField" type="text" name="search" v-model="search">
-    Latitude: <input id="latField" type="text" name="lat" v-model="lat">
-    Longitude: <input id="longField" type="text" name="long" v-model="long">
-    <select>
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-    </select>
-    <select>
-        <option v-for="option in options" v-text="option"></option>
-    </select>
-	<button id="searchBtn">Search</button>
-    <!-- Displays a window with a bulleted list of restaurants, sorted by distance. -->
-	<button>Get List</button>
-	<ul>
-		<li v-for="name in restaurants" v-text="name"></li>
-	</ul>
-</div>
+    <div id="map"></div>
+    <div id="root">
+        <h3>Restaurants in {{area}}:</h3>
+        Search: <input id="searchField" type="text" name="search" v-model="search">
+        Latitude: <input id="latField" type="text" name="lat" v-model="lat">
+        Longitude: <input id="longField" type="text" name="long" v-model="long">
+        Range: 
+        <select>
+            <option value="5">5 mi</option>
+            <option value="10">10 mi</option>
+            <option value="25">25 mi</option>
+            <option value="50">50 mi</option>
+        </select>
+        <select>
+            <option v-for="option in options" v-text="option"></option>
+        </select>
+        <button id="searchBtn">Search</button>
+        <!-- Displays a window with a bulleted list of restaurants, sorted by distance. -->
+        <button>Get List</button>
+        <ul>
+            <li v-for="name in restaurants" v-text="name"></li>
+        </ul>
+    </div>
 
 <script>
     
@@ -132,6 +144,33 @@
             });
         }
         
+        if (navigator.geolocation)
+        {
+            let pos =
+            {
+                lat: Number(app.lat),
+                lng: Number(app.long)
+            };
+            infoWindow.setPosition(pos);
+            /*
+            navigator.geolocation.getCurrentPosition(function(position) {
+                let pos = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                };
+                app.lat = TEMPlatitude;
+                app.long = TEMPlongitude;
+
+                infoWindow.setPosition(pos);
+                infoWindow.setContent('Location found.');
+                infoWindow.open(map);
+                map.setCenter(pos);
+                }, function() {
+                handleLocationError(true, infoWindow, map.getCenter());
+            });
+            */
+        }
+        
     };
     
     // localStorage code here
@@ -173,8 +212,8 @@
     {
         map = new google.maps.Map(document.querySelector('#map'),
         {
-            center: {lat: -34.397, lng: 150.644},
-            zoom: 6
+            center: {lat: 43.083040, lng: -77.6799},
+            zoom: 16
         });
         infoWindow = new google.maps.InfoWindow;
         // Try HTML5 geolocation.
