@@ -138,6 +138,15 @@
                             let json = JSON.parse(e.target.responseText)
                             console.log(json);
                             createMarkers(json.businesses);
+                            if (json.businesses != undefined && json.businesses[0] != undefined && json.businesses[0].location != undefined && json.businesses[0].location.city != undefined)
+                            {
+                                app.area = json.businesses[0].location.city;
+                            }
+                            else
+                            {
+                                app.area = "your area";
+                            }
+                            makeList(json.business);
                         }
                         xhr.open("GET", fetchUrl, true);
                         xhr.send();
@@ -192,7 +201,11 @@
         let latField = document.querySelector("#latField");
         let longField = document.querySelector("#longField");
 
-        searchField.onchange = e => { localStorage.setItem(searchKey, e.target.value); };
+        searchField.onchange = e =>
+        {
+            localStorage.setItem(searchKey, e.target.value);
+            app.search = e.target.value;
+        };
         latField.onchange = e => { localStorage.setItem(latKey, e.target.value); };
         longField.onchange = e => { localStorage.setItem(longKey, e.target.value); };
 
@@ -291,6 +304,11 @@
                     map: map
                 }));
             });
+        }
+        
+        function makeList(businesses)
+        {
+            
         }
     </script>
 
