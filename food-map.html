@@ -59,7 +59,7 @@
         <select id="optionSelect">
             <option v-for="option in options" v-text="option"></option>
         </select>
-        <button @click="searchButton">Search</button>
+        <button @Click="searchButton">Search</button>
         <!-- Displays a window with a bulleted list of restaurants, sorted by distance. -->
         <button>Get List</button>
         <ul>
@@ -86,6 +86,11 @@
                 methods:
                 {
                     searchButton() {
+                        for (let i = 0; i < markers.length; i++)
+                        {
+                            markers[i].setMap(null);
+                        }
+                        markers = [];
                         this.getData();
                         let searchString = searchField.value.trim();
                         // add punctuation removal here
