@@ -19,6 +19,7 @@
         crossorigin="anonymous"></script>
     <!-- Link to Firebase -->
     <script src="https://www.gstatic.com/firebasejs/5.10.0/firebase.js"></script>
+    <script src="categories.js"></script>
     <style>
         #map {
             height: 100%;
@@ -188,6 +189,17 @@
         searchField.onchange = e => { localStorage.setItem(searchKey, e.target.value); };
         latField.onchange = e => { localStorage.setItem(latKey, e.target.value); };
         longField.onchange = e => { localStorage.setItem(longKey, e.target.value); };
+
+        if (storedSearch) {
+            app.search = storedSearch;
+        }
+        if (storedLat) {
+            app.lat = storedLat;
+        }
+        if (storedLong) {
+            app.lng = storedLong;
+        }
+        
         document.querySelector("#radiusSelect").onchange = e =>
         {
             let radVal = e.target.value;
@@ -200,16 +212,20 @@
                 app.radius = Math.round(radVal * 1609.344);
             }
         };
-
-        if (storedSearch) {
-            app.search = storedSearch;
+        
+        let categories = [];
+        for (let i = 0; i < yelpList.length; i++)
+        {
+            for (let ii = 0; ii < yelpList[i].parents.length; ii++)
+            {
+                if (yelpList[i].parents[ii] == "restaurants")
+                {
+                    categories.push(yelpList[i].title);
+                    break;
+                }
+            }
         }
-        if (storedLat) {
-            app.lat = storedLat;
-        }
-        if (storedLong) {
-            app.lng = storedLong;
-        }
+        app.options = categories;
 
         let map, infoWindow;
         function initMap() {
