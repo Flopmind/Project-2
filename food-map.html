@@ -50,11 +50,10 @@
         Latitude: <input id="latField" type="text" name="lat" v-model="lat">
         Longitude: <input id="longField" type="text" name="lng" v-model="lng">
         Range:
-        <select>
+        <select id="radiusSelect">
             <option value="5">5 mi</option>
             <option value="10">10 mi</option>
             <option value="25">25 mi</option>
-            <option value="50">50 mi</option>
         </select>
         <select>
             <option v-for="option in options" v-text="option"></option>
@@ -79,7 +78,7 @@
                     options: ["category1", "category2", "category3"],
                     lat: 43.083040,
                     lng: -77.6799,
-                    radius: "",
+                    radius: 8047,
                     search: ""
                 },
                 methods:
@@ -110,7 +109,7 @@
                             let pos =
                             {
                                 lat: Number(app.lat),
-                                lng: Number(app.long)
+                                lng: Number(app.lng)
                             };
                             infoWindow.setPosition(pos);
                         }
@@ -189,6 +188,18 @@
         searchField.onchange = e => { localStorage.setItem(searchKey, e.target.value); };
         latField.onchange = e => { localStorage.setItem(latKey, e.target.value); };
         longField.onchange = e => { localStorage.setItem(longKey, e.target.value); };
+        document.querySelector("#radiusSelect").onchange = e =>
+        {
+            let radVal = e.target.value;
+            if (radVal > 10)
+            {
+                app.radius = 40000;
+            }
+            else
+            {
+                app.radius = Math.round(radVal * 1609.344);
+            }
+        };
 
         if (storedSearch) {
             app.search = storedSearch;
@@ -197,7 +208,7 @@
             app.lat = storedLat;
         }
         if (storedLong) {
-            app.long = storedLong;
+            app.lng = storedLong;
         }
 
         let map, infoWindow;
@@ -215,8 +226,8 @@
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
-                    app.lat = TEMPlatitude;
-                    app.long = TEMPlongitude;
+                    app.lat = pos.lat;
+                    app.lng = pos.lng;
 
                     infoWindow.setPosition(pos);
                     infoWindow.setContent('Location found.');
