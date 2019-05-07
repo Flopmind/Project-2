@@ -20,27 +20,7 @@
     <!-- Link to Firebase -->
     <script src="https://www.gstatic.com/firebasejs/5.10.0/firebase.js"></script>
     <script src="categories.js"></script>
-    <style>
-        #map {
-            height: 100%;
-        }
-
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        #root {
-            position: absolute;
-            top: 10px;
-            left: 200px;
-            padding: 15px;
-            border-radius: 15px;
-            background: rgba(211, 211, 211, 0.75);
-        }
-    </style>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
@@ -60,12 +40,6 @@
             <option v-for="option in options" v-text="option"></option>
         </select>
         <button @Click="searchButton">Search</button>
-        <!-- Displays a window with a bulleted list of restaurants, sorted by distance. -->
-        <button>Get List</button>
-        <ul>
-            <li v-for="restaurant in restaurants" v-text="restaurant"></li>
-            <li v-for="name in names" v-text="name"></li>
-        </ul>
     </div>
 
     <script src="main.js"></script>

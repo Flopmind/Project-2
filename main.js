@@ -8,6 +8,7 @@ const longKey = prefix + "Long";
 const storedSearch = localStorage.getItem(searchKey);
 const storedLat = localStorage.getItem(latKey);
 const storedLong = localStorage.getItem(longKey);
+let restaurants = [];
 
 let app = new Vue
     ({
@@ -22,16 +23,55 @@ let app = new Vue
             lng: -77.6799,
             radius: 8047,
             search: "",
-            category: "Afghan"
+            category: "Afghan",
+            searchTerm: "",
         },
         methods:
         {
             searchButton() {
-                for (let i = 0; i < this.restaurants.length; i++) {
-                    this.restaurants[i].marker.setMap(null);
+                for (let i = 0; i < restaurants.length; i++) {
+                    restaurants[i].marker.setMap(null);
                 }
-                this.getData();
-                let searchString = searchField.value.trim();
+                
+                let fetchUrl =
+                    "https://people.rit.edu/~jxs2828/330/Projects/Project2/yelp-proxy.php?" +
+                    "term=" + app.searchTerm +
+                    "&lat=" + app.lat +
+                    "&lng=" + app.lng +
+                    "&rad=" + app.radius +
+                    "&cat=" + app.category;
+
+                let xhr = new XMLHttpRequest();
+
+                //xhr.onprogress = (e) => console.log(`PROGRESS: ${e}`);
+                //xhr.onerror = (e) => console.log(`ERROR: ${e}`);
+                xhr.onload = (e) => {
+                    let json = JSON.parse(e.target.responseText)
+                    //createMarkers(json.businesses);
+                    if (json.businesses != undefined && json.businesses[0] != undefined && json.businesses[0].location != undefined && json.businesses[0].location.city != undefined) {
+                        app.area = json.businesses[0].location.city;
+                    }
+                    else {
+                        app.area = "your area";
+                    }
+                    restaurants = [];
+                    //app.names = [];
+                    json.businesses.forEach(element => {
+                        restaurants.push(new restaurant(
+                            element.name,
+                            element.price,
+                            element.coordinates.longitude,
+                            element.coordinates.latitude
+                        ));
+                            //uncomment to add namelist
+                        //app.names.push(element.name);
+                    });
+                    //app.restaurants = restaurants;
+                }
+                xhr.open("GET", fetchUrl, true);
+                xhr.send();
+                
+                let searchString = app.search.trim();
                 // add punctuation removal here
                 let searchTerms = searchString.split(" ");
                 for (let i = 0; i < searchTerms.length; i++) {
@@ -59,45 +99,6 @@ let app = new Vue
                     };
                     infoWindow.setPosition(pos);
                 }
-            },
-            getData() {
-                let fetchUrl =
-                    "https://people.rit.edu/~jxs2828/330/Projects/Project2/yelp-proxy.php?" +
-                    "term=" + this.search +
-                    "&lat=" + this.lat +
-                    "&lng=" + this.lng +
-                    "&rad=" + this.radius +
-                    "&cat=" + this.category;
-
-                let xhr = new XMLHttpRequest();
-
-                //xhr.onprogress = (e) => console.log(`PROGRESS: ${e}`);
-                //xhr.onerror = (e) => console.log(`ERROR: ${e}`);
-                xhr.onload = (e) => {
-                    let json = JSON.parse(e.target.responseText)
-                    //createMarkers(json.businesses);
-                    if (json.businesses != undefined && json.businesses[0] != undefined && json.businesses[0].location != undefined && json.businesses[0].location.city != undefined) {
-                        app.area = json.businesses[0].location.city;
-                    }
-                    else {
-                        app.area = "your area";
-                    }
-                    this.restaurants = [];
-                    this.names = [];
-                    json.businesses.forEach(element => {
-                        console.log("hi");
-                        this.restaurants.push(new restaurant(
-                            element.name,
-                            element.price,
-                            element.coordinates.longitude,
-                            element.coordinates.latitude
-                        ));
-                            //uncomment to add namelist
-                        this.names.push(element.name);
-                    });
-                }
-                xhr.open("GET", fetchUrl, true);
-                xhr.send();
             },
             searchFieldChange(event) {
                 localStorage.setItem(searchKey, event.target.value);
@@ -248,4 +249,14 @@ class restaurant {
         };
         google.maps.event.addListener(this.marker, 'click', this.handler);
     }
+}
+
+function step() {
+    app.restaurants = restaurants;
+    let terms = app.search.trim().split(' ');
+    for (let i = 1; i < terms.length; i++) {
+        term += terms[i];
+    }
+    app.searchTerm = term;
+    window.requestAnimationFrame(step);
 }
