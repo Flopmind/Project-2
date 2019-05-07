@@ -5,85 +5,16 @@
 	<title>Food Map Admin</title>
 </head>
 <body>
-    <h1>Most Searched Terms</h1>
-    <ol id="scoresList"><li>No data yet!</li></ol>
-    <h1 id="madMaxHeader"></h1>
+    <div id="root">
+        <h1>Most Searched Terms</h1>
+        <ol id="scoresList">
+            <li v-for="term in terms" v-text="term"></li>
+        </ol>
+        <h1 id="madMaxHeader"></h1>
+    </div>
 
-<!-- #1 - link to Firebase goes here  -->
 <script src="https://www.gstatic.com/firebasejs/5.9.3/firebase.js"></script>
-
-<script>
-    /* #2 - The rest of the Firebase setup code goes here */
-    
-    let config = {
-        apiKey: "AIzaSyDqD6AV81PzwbGdz0q28GTTXQmZXSS656U",
-        authDomain: "food-map-1edb8.firebaseapp.com",
-        databaseURL: "https://food-map-1edb8.firebaseio.com",
-        projectId: "food-map-1edb8",
-        storageBucket: "food-map-1edb8.appspot.com",
-        messagingSenderId: "335280513115"
-    };
-    firebase.initializeApp(config);
-    
-    console.log(firebase); // #3 - make sure firebase is loaded
-
-    // #4 This is where the magic happens!j 
-    firebase.database().ref("testTerms2").on("value", dataChanged, firebaseError);
-    
-    function dataChanged(data)
-    {
-        let unsortedList = [];
-        let obj = data.val();
-        console.log(obj);
-        let bigString="";
-        for (let key in obj)
-        {
-            unsortedList.push(obj[key]);
-        }
-        console.log(unsortedList);
-        let length = unsortedList.length;
-        let sortedList = unsortedList.sort(function(a, b){return b.count-a.count});
-        console.log(sortedList);
-        for (let i = 0; i < length; i++)
-        {
-            bigString += `<li>${sortedList[i].term } :  ${sortedList[i].count}</li>`;
-        }	
-        scoresList.innerHTML = bigString;
-        /*
-        for (let i = 0; i < length; i++)
-        {
-            let indexHighest = 0
-            for (let j = 1; j < unsortedList.length; j++)
-            {
-                if (unsortedList[indexHighest] < unsortedList[j])
-                {
-                    indexHighest = j;
-                }
-            }
-            sortedList.push(unsortedList[indexHighest]);
-            
-        }
-        */
-    }
-
-    function firebaseError(error)
-    {
-        console.log(error);
-    }
-    
-    /*
-    firebase.database().ref("scores2/MADMAX").on("value", madmaxChanged, firebaseError);
-
-    function madmaxChanged(data)
-    {
-        let obj = data.val();
-        console.log(`madmaxChanged = ${obj}`);
-        console.log(`userName = ${obj.userID}`);
-        console.log(`score= ${obj.score}`);
-        document.querySelector("#madMaxHeader").innerHTML = "MADMAX Score: " + obj.score;
-    }
-	*/
-    
-</script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="admin.js"></script>
 </body>
 </html>

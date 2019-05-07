@@ -47,22 +47,23 @@
     <div id="map"></div>
     <div id="root">
         <h3>Restaurants in {{area}}:</h3>
-        Search: <input id="searchField" type="text" name="search" v-model="search">
-        Latitude: <input id="latField" type="text" name="lat" v-model="lat">
-        Longitude: <input id="longField" type="text" name="lng" v-model="lng">
+        Search: <input @change="searchFieldChange($event)" id="searchField" type="text" name="search" v-model="search">
+        Latitude: <input id="latFieldChange($event)" type="text" name="lat" v-model="lat">
+        Longitude: <input id="longFieldChange($event)" type="text" name="lng" v-model="lng">
         Range:
-        <select id="radiusSelect">
+        <select @change="radiusSelectChange($event)" id="radiusSelect">
             <option value="5">5 mi</option>
             <option value="10">10 mi</option>
             <option value="25">25 mi</option>
         </select>
-        <select id="optionSelect">
+        <select @change="optionSelectChange($event)" id="optionSelect">
             <option v-for="option in options" v-text="option"></option>
         </select>
         <button @Click="searchButton">Search</button>
         <!-- Displays a window with a bulleted list of restaurants, sorted by distance. -->
         <button>Get List</button>
         <ul>
+            <li v-for="restaurant in restaurants" v-text="restaurant"></li>
             <li v-for="name in names" v-text="name"></li>
         </ul>
     </div>

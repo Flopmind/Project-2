@@ -1,4 +1,14 @@
 "use strict";
+
+// localStorage setup code here
+const prefix = "foodMap878454554486733";
+const searchKey = prefix + "Search"
+const latKey = prefix + "Lat";
+const longKey = prefix + "Long";
+const storedSearch = localStorage.getItem(searchKey);
+const storedLat = localStorage.getItem(latKey);
+const storedLong = localStorage.getItem(longKey);
+
 let app = new Vue
     ({
         el: '#root',
@@ -61,8 +71,8 @@ let app = new Vue
 
                 let xhr = new XMLHttpRequest();
 
-                xhr.onprogress = (e) => console.log(`PROGRESS: ${e}`);
-                xhr.onerror = (e) => console.log(`ERROR: ${e}`);
+                //xhr.onprogress = (e) => console.log(`PROGRESS: ${e}`);
+                //xhr.onerror = (e) => console.log(`ERROR: ${e}`);
                 xhr.onload = (e) => {
                     let json = JSON.parse(e.target.responseText)
                     //createMarkers(json.businesses);
@@ -75,17 +85,41 @@ let app = new Vue
                     this.restaurants = [];
                     this.names = [];
                     json.businesses.forEach(element => {
+                        console.log("hi");
                         this.restaurants.push(new restaurant(
                             element.name,
                             element.price,
                             element.coordinates.longitude,
-                            element.coordinates.latitude));
-//uncomment to add namelist
-//this.names.push(element.name);
+                            element.coordinates.latitude
+                        ));
+                            //uncomment to add namelist
+                        this.names.push(element.name);
                     });
                 }
                 xhr.open("GET", fetchUrl, true);
                 xhr.send();
+            },
+            searchFieldChange(event) {
+                localStorage.setItem(searchKey, event.target.value);
+                app.search = event.target.value;
+            },
+            latChange(event) {
+                localStorage.setItem(latKey, event.target.value);
+            },
+            lngChange(event) {
+                localStorage.setItem(longKey, event.target.value);
+            },
+            radiusSelectChange(event) {
+                let radVal = event.target.value;
+                if (radVal > 10) {
+                    app.radius = 40000;
+                }
+                else {
+                    app.radius = Math.round(radVal * 1609.344);
+                }
+            },
+            optionSelectChange(event) {
+                app.category = event.target.value;
             }
         },
         computed:
@@ -106,7 +140,7 @@ let config = {
 };
 firebase.initializeApp(config);
 
-const pathStart = "testTerms2";
+const pathStart = "Terms";
 
 firebase.database().ref(pathStart).on("value", dataChanged, firebaseError);
 
@@ -120,30 +154,13 @@ function dataChanged(data) {
 }
 
 function firebaseError(error) {
-    console.log(error);
+    
 }
-
-const searchField = document.querySelector("#searchField");
-const searchButton = document.querySelector("#searchBtn");
-
-
-// localStorage code here
-const prefix = "foodMap878454554486733";
-const searchKey = prefix + "Search"
-const latKey = prefix + "Lat";
-const longKey = prefix + "Long";
-const storedSearch = localStorage.getItem(searchKey);
-const storedLat = localStorage.getItem(latKey);
-const storedLong = localStorage.getItem(longKey);
-let latField = document.querySelector("#latField");
-let longField = document.querySelector("#longField");
 
 searchField.onchange = e => {
     localStorage.setItem(searchKey, e.target.value);
     app.search = e.target.value;
 };
-latField.onchange = e => { localStorage.setItem(latKey, e.target.value); };
-longField.onchange = e => { localStorage.setItem(longKey, e.target.value); };
 
 if (storedSearch) {
     app.search = storedSearch;
@@ -154,20 +171,6 @@ if (storedLat) {
 if (storedLong) {
     app.lng = storedLong;
 }
-
-document.querySelector("#radiusSelect").onchange = e => {
-    let radVal = e.target.value;
-    if (radVal > 10) {
-        app.radius = 40000;
-    }
-    else {
-        app.radius = Math.round(radVal * 1609.344);
-    }
-};
-
-document.querySelector("#optionSelect").onchange = e => {
-    app.category = e.target.value;
-};
 
 let categories = [];
 for (let i = 0; i < yelpList.length; i++) {
